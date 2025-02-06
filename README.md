@@ -12,6 +12,20 @@ YOLO-TS is a **TypeScript-based YOLO object detection library** powered by [Tens
 - **Customizable:** Configure labels, detection thresholds, and even a custom color palette.
 - **Lightweight & Modular:** Written in TypeScript for robust type-checking and maintainability.
 - **CDN-Ready:** Publish on npm and serve via CDNs like [jsDelivr](https://www.jsdelivr.com/) or [unpkg](https://unpkg.com/).
+- **Tested with YOLO Models:** Compatible with YOLOv8 and YOLO11.
+
+## Live Examples
+
+Check out the following demos to see YOLO-TS in action:
+
+(![Image Detection](doc/room.jpg)
+(![Image Detection](doc/girl.jpg)
+
+- 🖼️ **Image Detection:** [Live Demo](https://yolots-examples.vercel.app/)
+- 🎞️ **Video Detection:** [Live Demo](https://yolots-examples.vercel.app/video.html)
+- 📷 **Webcam Detection:** [Live Demo](https://yolots-examples.vercel.app/webcam.html)
+
+
 
 ## Installation
 
@@ -57,4 +71,5 @@ Contributions are welcome! If you’d like to improve YOLO-TS, please fork the r
 
 - Repository: https://github.com/josueggh/yolo-ts
 - Issues: https://github.com/josueggh/yolo-ts/issues
+
 
