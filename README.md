@@ -48,22 +48,72 @@ Or load directly from a CDN (UMD build):
 ```
 
 
+## Initial Configuration
+
+The `setup` method in YOLO-TS allows for customization using the following configuration options:
+
+```typescript
+export interface YOLOConfig {
+  modelUrl: string;
+  labels?: string[]; // Optional, defaulting to COCO categories
+  colors?: string[]; // Optional, custom colors for label display
+  displayLabels?: Set<string> | null; // Optional, filter specific labels to be displayed
+  scoreThreshold: number;
+}
+```
 ## API Overview
 
 YOLO-TS exposes a single class, YOLO, with the following primary methods:
 
 **setup(options)**
 Configure the model with custom settings (e.g., model URL, labels, colors, display filters, and score thresholds).
+```javascript
+yolo.setup({
+  modelUrl: "model/model.json",
+  labels?: ["person", "car", "dog"],
+  colors?: ["#FF0000", "#00FF00"],
+  displayLabels?: new Set(["person", "dog"]),
+  scoreThreshold: 0.3,
+});
+```
 
 **loadModel()**
 Loads the YOLO model from the specified URL. Returns a promise that resolves to the loaded model.
+```javascript
+yolo.loadModel().then((model) => {
+    console.log("Model loaded!", model)
+  });
+```
 
 **detect(source, model, canvasRef, callback)**
 Processes an image, video, or canvas element for object detection and renders bounding boxes on the provided canvas.
+```javascript
+yolo.detect(imageElement, model, canvas, (detections) => {
+  console.log(detections);
+});
+```
+
 
 **detectVideo(videoSource, model, canvasRef)**
 Continuously processes video frames for real-time detection.
+```javascript
+yolo.detectVideo(videoElement, model, canvas);
+```
 
+---
+## Exporting a YOLO Model for TensorFlow.js
+
+If you have a trained YOLO model and want to use it with YOLO-TS, you need to export it in TensorFlow.js format. Here's how you can do it:
+
+```python
+from ultralytics import YOLO
+
+# Load the YOLO model
+model = YOLO("yolo11n.pt")
+
+# Export the model to TensorFlow.js format
+model.export(format="tfjs")
+```
 
 ## Contributing
 
