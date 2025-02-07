@@ -2,7 +2,7 @@
   "name": "yolo-ts",
   "version": "1.0.1",
   "description": "A TypeScript-based YOLO object detection library using TensorFlow.js",
-  "main": "example/yolo.umd.js",
+  "main": "dist/yolo.umd.js",
   "module": "dist/yolo.esm.js",
   "types": "dist/index.d.ts",
   "scripts": {

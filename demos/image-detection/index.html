@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YOLO Detection</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.22.0/dist/tf-backend-webgl.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/yolo-ts@latest/dist/yolo.umd.js"></script>
+  <style>
+      body {
+          margin: 0;
+          min-height: 100vh;
+      }
+
+      @media (min-width: 768px) {
+          body {
+              display: flex;
+          }
+      }
+
+      .sidebar {
+          background: white;
+          padding: 20px;
+          box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+          display: flex;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+      }
+
+      @media (min-width: 768px) {
+          .sidebar {
+              width: 200px;
+              flex-direction: column;
+              overflow-x: hidden;
+              overflow-y: auto;
+          }
+      }
+
+      .thumbnail {
+          width: 120px;
+          height: 120px;
+          flex-shrink: 0;
+          object-fit: cover;
+          margin: 0 10px 0 0;
+          cursor: pointer;
+          border: 2px solid #e2e2e2;
+          transition: border-color 0.3s;
+      }
+
+      @media (min-width: 768px) {
+          .thumbnail {
+              width: 100%;
+              margin: 0 0 15px 0;
+          }
+      }
+
+      .thumbnail.active {
+          border-color: #3b82f6;
+      }
+
+      .main-content {
+          flex: 1;
+          padding: 20px;
+          background: #f3f4f6;
+          position: relative;
+      }
+
+      .image-container {
+          position: relative;
+          display: inline-block;
+          max-width: 100%;
+      }
+
+      #mainImage {
+          max-width: 100%;
+          height: auto;
+          display: block;
+      }
+
+      #detectionCanvas {
+          position: absolute;
+          top: 0;
+          left: 0;
+          pointer-events: none;
+      }
+
+      .loader {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.9);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+      }
+
+      .spinner {
+          width: 50px;
+          height: 50px;
+          border: 5px solid #f3f3f3;
+          border-top: 5px solid #3b82f6;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <img src="cat.webp" class="thumbnail" data-index="2">
+  <img src="pink.webp" class="thumbnail" data-index="2">
+</div>
+
+<div class="main-content">
+  <div class="loader">
+    <div class="spinner"></div>
+  </div>
+  <div class="image-container">
+    <img id="mainImage" src="pink.webp">
+    <canvas id="detectionCanvas"></canvas>
+  </div>
+</div>
+
+<script>
+  let yolo;
+  let model;
+  const mainImage = document.getElementById('mainImage');
+  const canvas = document.getElementById('detectionCanvas');
+  const loader = document.querySelector('.loader');
+  const thumbnails = document.querySelectorAll('.thumbnail');
+
+  async function initYOLO() {
+    try {
+      yolo = new YOLO();
+      yolo.setup({
+        modelUrl: "model/model.json",
+        scoreThreshold: 0.2,
+      });
+
+      model = await yolo.loadModel();
+      if (model) {
+        loader.style.display = 'none';
+        runDetection();
+      }
+    } catch (error) {
+      console.error("Error loading model:", error);
+    }
+  }
+
+  function runDetection() {
+    canvas.width = mainImage.naturalWidth;
+    canvas.height = mainImage.naturalHeight;
+    canvas.style.width = mainImage.clientWidth + 'px';
+    canvas.style.height = mainImage.clientHeight + 'px';
+
+    yolo.detect(mainImage, model, canvas, (detections) => {
+      console.log("Detection complete.", detections);
+    });
+  }
+
+  thumbnails.forEach(thumbnail => {
+    thumbnail.addEventListener('click', () => {
+      thumbnails.forEach(t => t.classList.remove('active'));
+      thumbnail.classList.add('active');
+      mainImage.src = thumbnail.src;
+      mainImage.onload = runDetection;
+    });
+  });
+
+  window.addEventListener('load', initYOLO);
+  window.addEventListener('resize', () => {
+    if (model) runDetection();
+  });
+</script>
+</body>
+</html>
