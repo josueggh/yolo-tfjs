@@ -6,11 +6,51 @@ import "@tensorflow/tfjs-backend-webgl";
  * Interface representing the configuration for the YOLO object detection.
  */
 export interface YOLOConfig {
+  /**
+   * The URL pointing to the TensorFlow.js YOLO model JSON file.
+   * This model should be compatible with TensorFlow.js for in-browser execution.
+   *
+   * @example "https://example.com/model/model.json"
+   */
   modelUrl: string;
+  /**
+   * Optional array of labels for object detection.
+   * If omitted, the model will default to using COCO dataset labels.
+   *
+   * @example ["person", "car", "dog"]
+   */
   labels: string[];
+  /**
+   * Optional array of colors for detected object labels.
+   * The color mapping corresponds to the label array.
+   * If omitted, a default color scheme is used.
+   *
+   * @example ["#FF0000", "#00FF00", "#0000FF"]
+   */
   colors: string[];
+  /**
+   * Optional set of labels to filter displayed objects.
+   * If null, all detected objects will be displayed.
+   *
+   * @example new Set(["person", "dog"])
+   */
   displayLabels: Set<string> | null;
+  /**
+   * The minimum confidence score threshold for displaying detected objects.
+   * Objects with a lower score will be ignored.
+   *
+   * @default 0.5
+   * @example 0.3
+   */
   scoreThreshold: number;
+  /**
+   * The width of the bounding box stroke for detected objects.
+   * Adjusting this value controls how thick the detection box appears.
+   *
+   * @default 2
+   * @example 10
+   */
+  boxLineWidth: number;
 }
 
 
@@ -49,6 +89,7 @@ class YOLO {
     ],
     displayLabels: null,
     scoreThreshold: 0.5,
+    boxLineWidth: 2,
   };
 
   /**
@@ -63,6 +104,7 @@ class YOLO {
     if (options.colors) this.config.colors = options.colors;
     if (options.displayLabels) this.config.displayLabels = new Set(options.displayLabels);
     if (options.scoreThreshold !== undefined) this.config.scoreThreshold = options.scoreThreshold;
+    if (options.boxLineWidth) this.config.boxLineWidth = options.boxLineWidth;
   }
 
   /**
@@ -292,12 +334,11 @@ class YOLO {
       const text = `${classLabel} - ${scorePercentage}%`;
 
       let [y1, x1, y2, x2] = boxesData.slice(i * 4, (i + 1) * 4);
-      // (x1, y1, x2, y2) are already in the original image coordinate system.
       const boxWidth = x2 - x1;
       const boxHeight = y2 - y1;
 
       ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = this.config.boxLineWidth;
       ctx.strokeRect(x1, y1, boxWidth, boxHeight);
       const textWidth = ctx.measureText(text).width;
       const textHeight = 16;

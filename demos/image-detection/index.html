@@ -107,9 +107,39 @@
           animation: spin 1s linear infinite;
       }
 
+      .controls {
+          margin-bottom: 20px;
+          padding: 15px;
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .control-group {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+
+      .control-group label {
+          font-size: 16px;
+          color: #4b5563;
+      }
+
+      .control-group input {
+          width: 60px;
+          padding: 4px 8px;
+          border: 1px solid #d1d5db;
+          border-radius: 4px;
+      }
+
       @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+              transform: rotate(0deg);
+          }
+          100% {
+              transform: rotate(360deg);
+          }
       }
   </style>
 </head>
@@ -120,6 +150,12 @@
 </div>
 
 <div class="main-content">
+  <div class="controls">
+    <div class="control-group">
+      <label for="lineWidth">Box Line Width:</label>
+      <input type="number" id="lineWidth" value="4" min="1" max="20" step="1">
+    </div>
+  </div>
   <div class="loader">
     <div class="spinner"></div>
   </div>
@@ -136,6 +172,7 @@
   const canvas = document.getElementById('detectionCanvas');
   const loader = document.querySelector('.loader');
   const thumbnails = document.querySelectorAll('.thumbnail');
+  const lineWidthInput = document.getElementById('lineWidth');
 
   async function initYOLO() {
     try {
@@ -143,6 +180,7 @@
       yolo.setup({
         modelUrl: "model/model.json",
         scoreThreshold: 0.2,
+        boxLineWidth: parseInt(lineWidthInput.value)
       });
 
       model = await yolo.loadModel();
@@ -161,6 +199,10 @@
     canvas.style.width = mainImage.clientWidth + 'px';
     canvas.style.height = mainImage.clientHeight + 'px';
 
+    yolo.setup({
+      boxLineWidth: parseInt(lineWidthInput.value)
+    });
+
     yolo.detect(mainImage, model, canvas, (detections) => {
       console.log("Detection complete.", detections);
     });
@@ -174,6 +216,8 @@
       mainImage.onload = runDetection;
     });
   });
+
+  lineWidthInput.addEventListener('change', runDetection);
 
   window.addEventListener('load', initYOLO);
   window.addEventListener('resize', () => {
