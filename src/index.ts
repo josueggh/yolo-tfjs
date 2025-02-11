@@ -51,6 +51,14 @@ export interface YOLOConfig {
    * @example 10
    */
   boxLineWidth: number;
+  /**
+   * Determines whether labels should be displayed inside the bounding boxes.
+   * If `true`, the detected object’s label will be rendered inside its corresponding box.
+   *
+   * @default true
+   * @example false
+   */
+  boxLabels: boolean;
 }
 
 
@@ -90,6 +98,7 @@ class YOLO {
     displayLabels: null,
     scoreThreshold: 0.5,
     boxLineWidth: 2,
+    boxLabels: true,
   };
 
   /**
@@ -143,7 +152,8 @@ class YOLO {
       boxes: number[];
       scores: number[];
       classes: number[];
-    }) => void = () => {}
+    }) => void = () => {
+    }
   ): Promise<void> {
     // Extract model dimensions (assumed square, e.g. 640 x 640)
     const [modelWidth, modelHeight] = model.inputShape.slice(1, 3);
@@ -331,7 +341,6 @@ class YOLO {
       if (this.config.displayLabels && !this.config.displayLabels.has(classLabel)) continue;
       const color = this.config.colors[classesData[i] % this.config.colors.length];
       const scorePercentage = (scoresData[i] * 100).toFixed(1);
-      const text = `${classLabel} - ${scorePercentage}%`;
 
       let [y1, x1, y2, x2] = boxesData.slice(i * 4, (i + 1) * 4);
       const boxWidth = x2 - x1;
@@ -340,12 +349,16 @@ class YOLO {
       ctx.strokeStyle = color;
       ctx.lineWidth = this.config.boxLineWidth;
       ctx.strokeRect(x1, y1, boxWidth, boxHeight);
-      const textWidth = ctx.measureText(text).width;
-      const textHeight = 16;
-      ctx.fillStyle = color;
-      ctx.fillRect(x1, y1 - textHeight, textWidth + 4, textHeight);
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText(text, x1 + 2, y1 - textHeight);
+
+      if (this.config.boxLabels) {
+        const text = `${classLabel} - ${scorePercentage}%`;
+        const textWidth = ctx.measureText(text).width;
+        const textHeight = 16;
+        ctx.fillStyle = color;
+        ctx.fillRect(x1, y1 - textHeight, textWidth + 4, textHeight);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(text, x1 + 2, y1 - textHeight);
+      }
     }
   }
 }
