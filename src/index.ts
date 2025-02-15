@@ -114,6 +114,7 @@ class YOLO {
     if (options.displayLabels) this.config.displayLabels = new Set(options.displayLabels);
     if (options.scoreThreshold !== undefined) this.config.scoreThreshold = options.scoreThreshold;
     if (options.boxLineWidth) this.config.boxLineWidth = options.boxLineWidth;
+    if ('boxLabels' in options) this.config.boxLabels = Boolean(options.boxLabels);
   }
 
   /**

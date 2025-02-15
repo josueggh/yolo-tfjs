@@ -18,8 +18,8 @@ YOLO-TS is a **TypeScript-based YOLO object detection library** powered by [Tens
 
 Check out the following demos to see YOLO-TS in action:
 
-(![Image Detection](doc/room.jpg)
-(![Image Detection](doc/girl.jpg)
+![Image Detection](doc/room.jpg)
+![Image Detection](doc/girl.jpg)
 
 - 🖼️ **Image Detection:** [Live Demo](https://yolots-examples.vercel.app/)
 - 🎞️ **Video Detection:** [Live Demo](https://yolots-examples.vercel.app/video.html)
