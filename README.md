@@ -59,6 +59,9 @@ export interface YOLOConfig {
   colors?: string[]; // Optional, custom colors for label display
   displayLabels?: Set<string> | null; // Optional, filter specific labels to be displayed
   scoreThreshold: number;
+  scoreThreshold: number;
+  boxLineWidth: number;
+  boxLabels: boolean;
 }
 ```
 ## API Overview
@@ -74,6 +77,8 @@ yolo.setup({
   colors?: ["#FF0000", "#00FF00"],
   displayLabels?: new Set(["person", "dog"]),
   scoreThreshold: 0.3,
+  boxLineWidth: 10,
+  boxLabels: true,
 });
 ```
 
