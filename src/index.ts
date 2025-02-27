@@ -70,6 +70,43 @@ export interface YOLOModel {
   inputShape: number[];
 }
 
+/**
+ * Interface representing the detection result from the YOLO model.
+ */
+export interface Detection {
+  /**
+   * Flattened array of bounding box coordinates.
+   * Each detection's box is represented by four consecutive numbers in the order [y1, x1, y2, x2].
+   *
+   * @example [50, 30, 200, 180,  ... ]
+   */
+  boxes: number[];
+
+  /**
+   * Array of confidence scores for each detection.
+   * Each score indicates the probability that the detection is accurate.
+   *
+   * @example [0.95, 0.87, ... ]
+   */
+  scores: number[];
+
+  /**
+   * Array of class indices for each detection.
+   * Each index corresponds to a specific label defined in the YOLO configuration.
+   *
+   * @example [0, 3, ... ]
+   */
+  classes: number[];
+
+  /**
+   * Array of label strings corresponding to the detected classes.
+   * These provide a human-readable description for each detected object.
+   *
+   * @example ["person", "dog", ... ]
+   */
+  labels: string[];
+}
+
 
 /**
  * YOLO class for object detection using TensorFlow.js.
@@ -143,18 +180,13 @@ class YOLO {
    * @param source - The source element (HTMLImageElement, HTMLVideoElement, or HTMLCanvasElement).
    * @param model - The loaded YOLO model.
    * @param canvasRef - The canvas element where the detection boxes will be rendered.
-   * @param callback - A callback function that receives detection data (boxes, scores, classes).
+   * @param callback - A callback function that receives detection data (boxes, scores, classes, labels).
    */
   public async detect(
     source: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement,
     model: YOLOModel,
     canvasRef: HTMLCanvasElement,
-    callback: (detections: {
-      boxes: number[];
-      scores: number[];
-      classes: number[];
-    }) => void = () => {
-    }
+    callback: (detections: Detection) => void = () => {}
   ): Promise<void> {
     // Extract model dimensions (assumed square, e.g. 640 x 640)
     const [modelWidth, modelHeight] = model.inputShape.slice(1, 3);
@@ -225,8 +257,21 @@ class YOLO {
     // Render the boxes on the canvas using the adjusted coordinates.
     this.renderBoxes(canvasRef, adjustedBoxes, scoresData, classesData, [1, 1]);
 
+    // Build an array of label text, matching each detection.
+    const labelNames: string[] = [];
+    for (let i = 0; i < classesData.length; i++) {
+      const classIndex = classesData[i];
+      const label = this.config.labels[classIndex]; // e.g. "person", "cat", etc.
+      labelNames.push(label);
+    }
+
     // Pass detection data back via the callback.
-    callback({boxes: adjustedBoxes, scores: Array.from(scoresData), classes: Array.from(classesData)});
+    callback({
+      boxes: adjustedBoxes,
+      scores: Array.from(scoresData),
+      classes: Array.from(classesData),
+      labels: labelNames
+    });
 
     tf.dispose([res, transposedRes, boxes, scores, classes, nmsIndices]);
     tf.engine().endScope();

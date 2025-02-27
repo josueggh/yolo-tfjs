@@ -59,7 +59,6 @@ export interface YOLOConfig {
   colors?: string[]; // Optional, custom colors for label display
   displayLabels?: Set<string> | null; // Optional, filter specific labels to be displayed
   scoreThreshold: number;
-  scoreThreshold: number;
   boxLineWidth: number;
   boxLabels: boolean;
 }
@@ -91,10 +90,38 @@ yolo.loadModel().then((model) => {
 ```
 
 **detect(source, model, canvasRef, callback)**
-Processes an image, video, or canvas element for object detection and renders bounding boxes on the provided canvas.
+Processes an image, video, or canvas element for object detection using the YOLO model. It performs the following steps:
+
+- **Preprocessing:**  
+  Resizes and pads the source element (using letterboxing) to match the model's input dimensions.
+
+- **Inference:**  
+  Runs the YOLO model on the preprocessed input to generate detection predictions.
+
+- **Postprocessing:**  
+  Applies non-max suppression, adjusts the detection coordinates back to the original image dimensions, and maps numeric class indices to human-readable labels.
+
+- **Rendering:**  
+  Draws bounding boxes (with optional labels and scores) on the provided canvas element.
+
+- **Callback:**  
+  Invokes the supplied callback with a detection object that includes:
+    - **boxes:** A flattened array of bounding box coordinates in the format `[y1, x1, y2, x2, ...]`.
+    - **scores:** An array of confidence scores for each detection.
+    - **classes:** An array of numeric class indices.
+    - **labels:** An array of human-readable label strings corresponding to the detected classes.
+
+
 ```javascript
 yolo.detect(imageElement, model, canvas, (detections) => {
   console.log(detections);
+  // Example output:
+  // {
+  //   boxes: [50, 30, 200, 180, 210, 45, 350, 300],
+  //   scores: [0.95, 0.87],
+  //   classes: [0, 3],
+  //   labels: ["person", "dog"]
+  // }
 });
 ```
 
