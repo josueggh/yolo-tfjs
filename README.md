@@ -162,6 +162,6 @@ model.export(format="tfjs")
 Contributions are welcome! If you’d like to improve YOLO-TFJS-VISION, please fork the repository and submit a pull request.
 
 - Repository: https://github.com/josueggh/yolo-tfjs-vision
-- Issues: https://github.com/josueggh/yolo-tfjs/issues
+- Issues: https://github.com/josueggh/yolo-tfjs-vision/issues
 
 
